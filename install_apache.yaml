@@ -9,12 +9,15 @@
   - name: update repository index
     apt:
       update_cache: yes
+    when: ansible_distribution == "ubuntu"
 
   - name: install apache2 package
     apt:
         name: apache2=2.4.58-1ubuntu8.6
         state: latest
         update_cache: yes
+    when: ansible_distribution == "ubuntu"
+
     register: apache_install
     until: apache_install is succeeded
     retries: 5
@@ -24,8 +27,37 @@
     apt:
        name: libapache2-mod-php
        state: latest
+    when: ansible_distribution == "ubuntu"
+
     register: php_support
     until: php_support is succeeded
     retries: 5
     delay: 10
 
+  - name: update repository index
+    dnf:
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: install apache2 package
+    dnf:
+        name: httpd
+        state: latest
+        update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+    register: apache_install
+    until: apache_install is succeeded
+    retries: 5
+    delay: 10
+
+  - name: add php support for apache
+    dnf:
+       name: php
+       state: latest
+    when: ansible_distribution == "CentOS"
+
+    register: php_support
+    until: php_support is succeeded
+    retries: 5
+    delay: 10
